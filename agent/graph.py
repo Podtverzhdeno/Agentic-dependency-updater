@@ -122,25 +122,12 @@ async def process_node(state: DependencyState):
 
         elif update_type == "major":
             await ctx.warning(f"{package}: major-обновление, анализ рисков")
+            risk = await analyze_breaking_changes(package, current_version, latest_version, llm)  # если async
+            result_entry["risk_level"] = risk.get("risk_level", "High")
 
-            risk = analyze_breaking_changes(
-                package,
-                current_version,
-                latest_version,
-                llm
-            )
-
-            result_entry["risk_level"] = risk.get("risk_level")
-
-            if risk.get("is_safe"):
+            if risk.get("is_safe", False):
                 await ctx.info(f"{package}: LLM считает обновление безопасным")
-
-                update_result = update_dependency_file(
-                    file_path,
-                    package,
-                    latest_version
-                )
-
+                update_result = update_dependency_file(file_path, package, latest_version)
                 if update_result.get("success"):
                     save_to_history(state["db_path"], {
                         "package": package,
@@ -148,13 +135,11 @@ async def process_node(state: DependencyState):
                         "new_version": latest_version,
                         "status": "success"
                     })
-
-                    result_entry["status"] = "updated"
+                    result_entry["status"] = "updated"  # <-- обновляем статус
                     await ctx.info(f"{package} обновлён после анализа")
                 else:
                     result_entry["status"] = "failed"
                     await ctx.error(f"{package} не удалось обновить")
-
             else:
                 result_entry["status"] = "skipped_risky"
                 await ctx.warning(f"{package}: обновление пропущено (риск: {risk.get('risk_level')})")

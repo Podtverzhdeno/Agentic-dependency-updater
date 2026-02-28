@@ -1,4 +1,3 @@
-# server_with_inspector.py
 import os
 import asyncio
 from fastmcp import FastMCP, Context
@@ -13,15 +12,12 @@ from mcp_server.tools.compare_versions import compare_versions
 from mcp_server.tools.update_dependency_file import update_dependency_file
 from mcp_server.tools.save_to_history import save_to_history
 from mcp_server.tools.generate_report import generate_report
-from mcp_server.tools.analyze_breaking_changes import analyze_breaking_changes
 
-# Инициализация сервера
 mcp = FastMCP(
     "Agentic Dependency Updater",
     instructions="Сервер для автоматического управления жизненным циклом зависимостей Python-проектов."
 )
 
-# Инициализация Inspector
 inspector = Inspector()
 
 @mcp.tool()
@@ -63,7 +59,7 @@ async def tool_parse_dependencies(file_path: str, ctx: Context) -> list:
 @log_decorator
 async def tool_get_latest_and_compare(package: str, current_version: str, ctx: Context) -> dict:
     await ctx.debug(f"Запрос PyPI для пакета: {package}")
-    latest_data = fetch_latest_version(package)
+    latest_data = await fetch_latest_version(package)
     if "error" in latest_data:
         return latest_data
     comparison = compare_versions(current_version, latest_data["latest_version"])

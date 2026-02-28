@@ -15,11 +15,9 @@ def save_to_history(db_path: str, update_data: Dict[str, Any]) -> Dict[str, Unio
         Dict: Статус сохранения {'success': bool, 'error': str (optional)}.
     """
     try:
-        # Подключение к базе (создаст файл, если его нет)
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        # Создание таблицы истории обновлений
         cursor.execute('''
                        CREATE TABLE IF NOT EXISTS update_history (
                                                                      id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +29,6 @@ def save_to_history(db_path: str, update_data: Dict[str, Any]) -> Dict[str, Unio
                        )
                        ''')
 
-        # Вставка записи о текущем действии
         cursor.execute('''
                        INSERT INTO update_history (package, old_version, new_version, status, timestamp)
                        VALUES (?, ?, ?, ?, ?)
@@ -48,5 +45,4 @@ def save_to_history(db_path: str, update_data: Dict[str, Any]) -> Dict[str, Unio
         return {"success": True}
 
     except Exception as e:
-        # Ошибка в памяти не должна прерывать основной цикл, но должна быть зафиксирована в State
         return {"success": False, "error": str(e)}

@@ -21,7 +21,6 @@ def generate_report(results: List[Dict[str, Any]], project_path: str) -> str:
 
     try:
         with open(report_path, "w", encoding="utf-8") as f:
-            # Заголовок
             f.write("# Dependency Update Report\n\n")
             f.write(f"**Project path:** `{project_path}`\n\n")
             f.write(f"**Generated at:** {timestamp.isoformat()}\n\n")
@@ -62,7 +61,6 @@ def generate_report(results: List[Dict[str, Any]], project_path: str) -> str:
 
                 f.write("\n---\n\n")
 
-            # Итоговая сводка
             f.write("# Summary\n\n")
             f.write(f"- Total packages analyzed: **{total}**\n")
             f.write(f"- Successfully updated: **{updated}**\n")

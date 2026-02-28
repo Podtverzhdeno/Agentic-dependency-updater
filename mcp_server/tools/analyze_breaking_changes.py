@@ -1,18 +1,15 @@
-from unittest import result
-
 from pydantic import BaseModel, Field
 from typing import Dict, Any, List
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
 
-# Определяем схему ответа для LLM через Pydantic
 class SafetyAssessment(BaseModel):
     is_safe: bool = Field(description="Можно ли обновлять пакет автоматически")
     risk_level: str = Field(description="Уровень риска: Low, Medium, High")
     breaking_changes: List[str] = Field(description="Список потенциально ломающих изменений")
     reasoning: str = Field(description="Краткое обоснование решения")
 
-def analyze_breaking_changes(
+async def analyze_breaking_changes(
         package: str,
         current: str,
         latest: str,

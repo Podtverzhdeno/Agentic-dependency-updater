@@ -13,17 +13,13 @@ def scan_project(path: str) -> List[str]:
         List[str]: Список найденных путей к файлам зависимостей.
     """
     dependency_files = []
-    # Определяем целевые файлы, которые умеет обрабатывать наш агент
     target_files = {"requirements.txt", "pyproject.toml"}
 
-    # Рекурсивный обход директории
     for root, dirs, files in os.walk(path):
-        # Оптимизация: не заходим в venv, .git и скрытые папки
         dirs[:] = [d for d in dirs if not d.startswith('.') and d not in {'venv', 'node_modules'}]
 
         for file in files:
             if file in target_files:
-                # Сохраняем полный путь к найденному файлу
                 full_path = os.path.join(root, file)
                 dependency_files.append(full_path)
 

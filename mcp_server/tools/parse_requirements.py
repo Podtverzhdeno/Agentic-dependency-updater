@@ -13,7 +13,6 @@ def parse_requirements(file_path: str) -> List[Dict[str, str]]:
         List[Dict[str, str]]: Список зависимостей со спецификациями версий.
     """
     dependencies = []
-    # Регулярное выражение для базового парсинга: имя_пакета и версия
     pattern = re.compile(r'^([a-zA-Z0-9\-_]+)(?:==|>=|<=|~=|>|<)?([0-9a-zA-Z\.\-_]*)')
 
     try:
@@ -32,7 +31,6 @@ def parse_requirements(file_path: str) -> List[Dict[str, str]]:
                         "version": version if version else "latest"
                     })
     except Exception as e:
-        # В агентских системах важно возвращать понятные ошибки в контекст [3]
         return [{"error": f"Could not read {file_path}: {str(e)}"}]
 
     return dependencies

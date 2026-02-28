@@ -15,12 +15,10 @@ def compare_versions(current: str, latest: str) -> Dict[str, Optional[str]]:
     if current == latest or latest == "unknown":
         return {"update_type": None, "needs_analysis": False}
 
-    # Очищаем от символов ^ и ~ и разбиваем на части
     curr_parts = current.replace('^', '').replace('~', '').split('.')
     late_parts = latest.split('.')
 
     try:
-        # ИСПРАВЛЕНИЕ: берем ПЕРВЫЙ элемент списка, а не весь список
         c_major = int(curr_parts[0]) if len(curr_parts) > 0 else 0
         l_major = int(late_parts[0]) if len(late_parts) > 0 else 0
 
@@ -30,7 +28,6 @@ def compare_versions(current: str, latest: str) -> Dict[str, Optional[str]]:
         c_patch = int(curr_parts[2]) if len(curr_parts) > 2 else 0
         l_patch = int(late_parts[2]) if len(late_parts) > 2 else 0
 
-        # Логика определения типа обновления
         if l_major > c_major:
             return {
                 "update_type": "Major",
