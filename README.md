@@ -1,28 +1,101 @@
-# Agentic Dependency Updater MCP Server
+Agentic Dependency Updater
 
-**Локальный ИИ-агент для безопасного и автоматизированного обновления зависимостей Python-проектов.**
+Agentic Dependency Updater — это инструмент для анализа и обновления зависимостей Python-проекта с использованием агентной архитектуры и локальной LLM.
 
-## Описание проекта
-Этот проект реализует концепцию **Agentic Engineering**, превращая обычную нейросеть в полноценного "исполнителя задач" [1, 3]. Система использует **LangGraph** как "мозг" для управления состоянием и **FastMCP** как "руки" для взаимодействия с файловой системой и внешним миром (PyPI) [4-6].
+Проект упакован в Docker и включает внутри контейнера:
 
-### Ключевые возможности:
-* **Автономное планирование**: Агент сам решает, какие инструменты вызвать на основе SemVer обновлений [2, 7].
-* **Интеллектуальный анализ рисков**: Локальная LLM оценивает вероятность breaking changes при мажорных обновлениях [8-10].
-* **Полная локальность**: Работает без API-ключей, используя Transformers и SQLite для истории [11-13].
-* **Docker-ready**: Единый образ для запуска сервера и проведения тестов [14, 15].
+fastmcp — MCP-сервер
 
-##  Технический стек
-* **Оркестратор**: LangGraph (графы состояний и циклическая логика) [4, 16, 17].
-* **Интерфейс инструментов**: FastMCP (Model Context Protocol) [5, 18, 19].
-* **LLM**: Transformers (DeepSeek-Coder / Mistral-Small) [10, 20, 21].
-* **База данных**: SQLite (эпизодическая память агента) [22, 23].
+langgraph + langchain — агентную логику
 
-##  Быстрый старт
+torch + transformers — локальную LLM
 
-### Сборка контейнера
-```bash
-docker build -t dependency-updater .
-Запуск MCP-сервера
-docker run -p 8000:8000 dependency-updater serve
-Запуск smoke-теста
-docker run dependency-updater smoke
+SQLite — историю запусков
+
+Поскольку контейнер содержит локальную LLM (через torch и transformers), итоговый Docker-образ весит много (несколько гигабайт). Придется ждать ~20 минут (есть аналогичный репозиторий, использующий Api_key для LLM, где образ будет значительно меньше)
+
+Клонирование проекта
+git clone https://github.com/Podtverzhdeno/Agentic-dependency-updater
+cd Agentic-dependency-updater
+Сборка Docker-образа
+docker build -t agentic-dependency-updater:latest .
+
+Эта команда:
+
+читает Dockerfile
+
+устанавливает все зависимости из requirements.txt
+
+собирает контейнер с локальной LLM
+
+создаёт образ agentic-dependency-updater:latest
+
+Запуск обновления зависимостей
+
+Основная команда запуска:
+
+docker run agentic-dependency-updater update /app/demo_project /app/data/history.db
+
+Где:
+
+update — режим обновления зависимостей
+
+/app/demo_project — путь к анализируемому проекту внутри контейнера
+
+/app/data/history.db — SQLite база истории
+
+Контейнер:
+
+Сканирует проект
+
+Определяет зависимости
+
+Проверяет актуальные версии
+
+Формирует отчёт
+
+Сохраняет историю выполнения
+
+Smoke-тест
+
+Для проверки работоспособности:
+
+docker run agentic-dependency-updater update smoke
+
+Команда выполняет тестовый запуск и проверяет корректность работы агентов и MCP-логики.
+
+Полный цикл работы
+
+Клонирование репозитория
+
+Сборка образа
+
+Запуск команды обновления
+
+git clone https://github.com/Podtverzhdeno/Agentic-dependency-updater
+cd Agentic-dependency-updater
+
+docker build -t agentic-dependency-updater:latest .
+
+docker run agentic-dependency-updater update /app/demo_project /app/data/history.db
+Особенности
+
+Используется локальная LLM внутри контейнера.
+
+Образ весит много из-за torch и зависимостей HuggingFace.
+
+Не требуется установка Python или библиотек на хост-машине.
+
+Вся логика запускается из Docker.
+
+Назначение проекта
+
+Инструмент предназначен для:
+
+анализа зависимостей Python-проекта
+
+выявления устаревших пакетов
+
+автоматизированной проверки обновлений
+
+генерации отчётов с использованием агентной архитектуры
